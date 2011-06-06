@@ -1,0 +1,2 @@
+Fabricator(:trolley) do
+end
