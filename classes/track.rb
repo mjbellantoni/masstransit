@@ -1,5 +1,5 @@
 require "chingu"
-
+require "texplay"
 
 class OffTheRailsException < RuntimeError
 end
@@ -41,6 +41,10 @@ class Track  < Chingu::BasicGameObject
 
   def t_b
     @terminal_b
+  end
+  
+  def length
+    Gosu::distance(t_a.x, t_a.y, t_b.x, t_b.y)
   end
 
   def trolley
@@ -86,6 +90,12 @@ class Track  < Chingu::BasicGameObject
     else
       raise RuntimeError, "Unable to orient direction."
     end
+  end
+
+  def draw
+    g_ax, g_ay = Numeric.world_to_gosu(t_a.x, t_a.y)
+    g_bx, g_by = Numeric.world_to_gosu(t_b.x, t_b.y)
+    $window.draw_line(g_ax, g_ay, Gosu::Color::GRAY, g_bx, g_by, Gosu::Color::GRAY)
   end
 
 end

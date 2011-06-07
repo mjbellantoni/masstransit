@@ -4,8 +4,10 @@ $:.unshift File.dirname(__FILE__)
 require 'gosu'
 require 'chingu'
 require 'lib/gosu/window'
-require 'classes/station'
+require 'lib/gosu/numeric'
+# require 'classes/station'
 require 'classes/trolley'
+require 'classes/track'
 
 
 module ZOrder
@@ -93,6 +95,7 @@ class Player
 
 end
 
+$window = nil
 
 class GameWindow < Chingu::Window
 
@@ -102,25 +105,31 @@ class GameWindow < Chingu::Window
      super(1280, 800, true)
      self.caption = "Gosu Tutorial Game"
 
-     @space = CP::Space.new
-
      #Create stations
-     @stations = $stations_data.map do |station_data|
-       Station.new(self, station_data[0], station_data[1] + 200, 1600.0)
-     end
-     
-     @trolley = Trolley.new(self, @stations[0].x, @stations[0].y)
+     # @stations = $stations_data.map do |station_data|
+     #   Station.new(self, station_data[0], station_data[1] + 200, 1600.0)
+     # end
 
-     @player = Player.new(self)
-     @player.warp(320, 240)
+     # Create a track.
+     @track = Track.new(200, 1600, 1500, 2100)
+
+     # Create a trolley and put it on the track.
+     @trolley = Trolley.new
+     @track.t_b.carry(@trolley)
+
+     # Run the trolley.
+     @trolley.forward
 
      @font = Gosu::Font.new(self, Gosu::default_font_name, 30)
      @time = Time.now
+     
+     $window = self
    end
 
    def draw
      @trolley.draw
-     @stations.each { |station| station.draw }
+     # @stations.each { |station| station.draw }
+     @track.draw
      @font.draw("Day 1 #{@time.strftime('%H:%M:%S')}", 0, 0, 0)
    end
 
@@ -128,11 +137,7 @@ class GameWindow < Chingu::Window
     # This is getting called 1/sec in game time.
     @time += 1
 
-    # Chipmunk
-    # @substeps = 3
-    # # @dt is the amount of time between each substep.
-    # @dt = (1.0/60.0) / @substeps
-    @space.step(1.0) # 1.0 second each time through.
+    @track.update
 
     # Called 60 fps
     if button_down? Gosu::KbLeft or button_down? Gosu::GpLeft then
