@@ -18,15 +18,13 @@ class Trolley < Chingu::BasicGameObject
   def initialize
     super()
     stop
-
-   @image = lambda do
-     TexPlay.create_image($window,10,10).paint { circle(5,5,5, :color => :green) }
-   end
+   @track = nil
 
   end
 
-  def locate_at(x, y)
-    @x, @y = x, y
+  def locate_at(track, x, y)
+    # puts "I'm at (#{x}, #{y})"
+    @track, @x, @y = track, x, y
   end
 
   def forward
@@ -43,6 +41,10 @@ class Trolley < Chingu::BasicGameObject
 
   def stopped?
     @v == 0.0
+  end
+
+  def update
+    @track.update
   end
 
   def draw

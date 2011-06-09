@@ -15,11 +15,11 @@ describe Track, "when created" do
   end
 
   it "has an unconnected A terminal" do
-    @track.t_a.should_not be_connected
+    @track.t_a.should_not be_extended
   end
 
   it "has an unconnected B terminal" do
-    @track.t_b.should_not be_connected
+    @track.t_b.should_not be_extended
   end
 
 end
@@ -55,7 +55,7 @@ shared_examples_for "basic single track" do |a_x, a_y, b_x, b_y, ab, ba|
 
         context "after one step (one second)" do
           before(:each) do
-            @track.update
+            @trolley.update
           end
 
           it "tells the trolley it is at (#{ab[0]}, #{ab[1]})" do
@@ -66,7 +66,7 @@ shared_examples_for "basic single track" do |a_x, a_y, b_x, b_y, ab, ba|
 
         context "after two steps (two seconds)" do
           before(:each) do
-            2.times { @track.update }
+            2.times { @trolley.update }
           end
 
           it "tells the trolley it is at (#{ab[2]}, #{ab[3]})" do
@@ -77,11 +77,11 @@ shared_examples_for "basic single track" do |a_x, a_y, b_x, b_y, ab, ba|
 
         context "after three steps (three seconds)" do
           before(:each) do
-            2.times { @track.update }
+            2.times { @trolley.update }
           end
 
           it "the trolley is off the end of the track!" do
-            lambda { @track.update }.should raise_error(OffTheRailsException, "The trolley ran off the end of the track!")
+            lambda { @trolley.update }.should raise_error(OffTheRailsException, "The trolley ran off the end of the track!")
           end
         end
 
@@ -107,7 +107,7 @@ shared_examples_for "basic single track" do |a_x, a_y, b_x, b_y, ab, ba|
 
         context "after one step (one second)" do
           before(:each) do
-            @track.update
+            @trolley.update
           end
 
           it "tells the trolley it is at (#{ba[0]}, #{ba[1]})" do
@@ -118,7 +118,7 @@ shared_examples_for "basic single track" do |a_x, a_y, b_x, b_y, ab, ba|
 
         context "after two steps (two seconds)" do
           before(:each) do
-            2.times { @track.update }
+            2.times { @trolley.update }
           end
 
           it "tells the trolley it is at (#{ba[2]}, #{ba[3]})" do
@@ -129,18 +129,17 @@ shared_examples_for "basic single track" do |a_x, a_y, b_x, b_y, ab, ba|
 
         context "after three steps (three seconds)" do
           before(:each) do
-            2.times { @track.update }
+            2.times { @trolley.update }
           end
 
           it "the trolley is off the end of the track!" do
-            lambda { @track.update }.should raise_error(OffTheRailsException, "The trolley ran off the end of the track!")
+            lambda { @trolley.update }.should raise_error(OffTheRailsException, "The trolley ran off the end of the track!")
           end
         end
 
       end
 
     end
-
 
   end
 
