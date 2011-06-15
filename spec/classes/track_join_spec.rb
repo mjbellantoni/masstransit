@@ -9,7 +9,7 @@ describe Track do
 
     before(:each) do
       setup_chingu
-      @track1 = Track.new(0, 0, 0, 5)
+      @track1 = Track.new(:a_x => 0, :a_y => 0, :b_x => 0, :b_y => 5)
       @track2 = @track1.t_b.extend_to(0, 10)
       @trolley = Fabricate(:trolley)
     end
@@ -132,7 +132,7 @@ describe Track do
 
     before(:each) do
       setup_chingu
-      @track1 = Track.new(0, 0, 0, 4.470)
+      @track1 = Track.new(:a_x => 0, :a_y => 0, :b_x => 0, :b_y => 4.470)
       @track2 = @track1.t_b.extend_to(0, 8.940)
       @trolley = Fabricate(:trolley)
     end

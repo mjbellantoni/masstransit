@@ -1,5 +1,5 @@
 require "chingu"
-require "texplay"
+
 
 class OffTheRailsException < RuntimeError
 end
@@ -41,7 +41,7 @@ class Track  < Chingu::BasicGameObject
 
     # Extend this terminal with another track.
     def extend_to(x, y)
-      Track.create(@x, @y, x, y).tap do |extension|
+      Track.create(:a_x => @x, :a_y => @y, :b_x => x, :b_y => y).tap do |extension|
         Terminal.link(self, extension.t_a)
       end
     end
@@ -68,10 +68,12 @@ class Track  < Chingu::BasicGameObject
   A_TO_B = 0
   B_TO_A = 1
 
-  def initialize(a_x, a_y, b_x, b_y)
-    super()
-    @terminal_a = Terminal.new(self, a_x, a_y, A_TO_B)
-    @terminal_b = Terminal.new(self, b_x, b_y, B_TO_A)
+  # def initialize(a_x, a_y, b_x, b_y)
+  def initialize(options)
+
+    super(options)
+    @terminal_a = Terminal.new(self, options[:a_x], options[:a_y], A_TO_B)
+    @terminal_b = Terminal.new(self, options[:b_x], options[:b_y], B_TO_A)
     @trolley = nil
     @trolley_direction = nil
   end
@@ -118,7 +120,6 @@ class Track  < Chingu::BasicGameObject
       vy = trolley.v * Math.sin(theta)
 
       d = Gosu::distance(trolley.x, trolley.y, x1, y1)
-      # puts "O: from: (#{x0}, #{y0}) to: (#{x1}, #{y1}) t: (#{trolley.x}, #{trolley.y}) d: #{d}"
       unless d < trolley.v
         trolley.locate_at(self, trolley.x + vx, trolley.y + vy)
       else

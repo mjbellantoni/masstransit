@@ -7,7 +7,7 @@ describe Track, "when created" do
 
   before(:each) do
     setup_chingu
-    @track = Track.new(0, 0, 0, 10)
+    @track = Track.new(:a_x => 0, :a_y => 0, :b_x => 0, :b_y => 10)
   end
 
   it "does not carry a trolley" do
@@ -29,10 +29,10 @@ end
 shared_examples_for "basic single track" do |a_x, a_y, b_x, b_y, ab, ba|
 
   context "from a = (#{a_x}, #{a_y}) to b = (#{b_x}, #{b_y})" do
-    
+
     before(:each) do
       setup_chingu
-      @track = Track.new(a_x, a_y, b_x, b_y)
+      @track = Track.new(:a_x => a_x, :a_y => a_y, :b_x => b_x, :b_y => b_y)
       @trolley = Fabricate(:trolley)
     end
 
