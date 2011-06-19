@@ -8,6 +8,7 @@ GEM
     crack (0.1.8)
     diff-lcs (1.1.2)
     fabrication (0.9.5)
+    geokit (1.6.0)
     gosu (0.7.31)
     mime-types (1.16)
     rest-client (1.6.1)
@@ -20,8 +21,6 @@ GEM
     rspec-expectations (2.6.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.6.0)
-    texplay (0.3.5)
-      gosu (>= 0.7.25)
 
 PLATFORMS
   ruby
@@ -29,6 +28,6 @@ PLATFORMS
 DEPENDENCIES
   chingu
   fabrication
+  geokit
   gosu
   rspec
-  texplay

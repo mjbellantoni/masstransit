@@ -1,4 +1,5 @@
 require "chingu"
+require "observer"
 
 
 class OffTheRailsException < RuntimeError
@@ -10,6 +11,8 @@ class Track  < Chingu::BasicGameObject
 
   # Handles the connections between Tracks.
   class Terminal
+
+    include Observable
 
     attr_accessor :x, :y, :track
 
@@ -24,18 +27,21 @@ class Track  < Chingu::BasicGameObject
     # Place a trolley onto the system.
     def carry(trolley)
       @track.carry(trolley, @direction)
+      notify(:enter, trolley)
       trolley.locate_at(@track, @x, @y)
     end
 
     # Pick up the trolley from another track.
     def pickup(trolley, duty_cycle = 1.0)
       @track.carry(trolley, @direction)
+      notify(:enter, trolley)
       @track.update
     end
 
     # Hand off the trolley to another track.
     def handoff(trolley, duty_cycle = 1.0)
       @track.drop
+      notify(:exit, trolley)
       @link.pickup(trolley, duty_cycle)
     end
 
@@ -60,9 +66,16 @@ class Track  < Chingu::BasicGameObject
       t_y.link_to(t_x)
     end
 
+    def notify(action, trolley)
+      # puts "Notify #{action}"
+      changed
+      notify_observers(action, trolley)
+    end
+    private :notify
+
   end
 
-  trait :sprite # Do I need this?
+  trait :sprite
   attr_accessor :trolley
 
   A_TO_B = 0
@@ -70,7 +83,6 @@ class Track  < Chingu::BasicGameObject
 
   # def initialize(a_x, a_y, b_x, b_y)
   def initialize(options)
-
     super(options)
     @terminal_a = Terminal.new(self, options[:a_x], options[:a_y], A_TO_B)
     @terminal_b = Terminal.new(self, options[:b_x], options[:b_y], B_TO_A)

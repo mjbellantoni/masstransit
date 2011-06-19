@@ -18,8 +18,7 @@ class Trolley < Chingu::BasicGameObject
   def initialize
     super()
     stop
-   @track = nil
-
+    @track = nil
   end
 
   def locate_at(track, x, y)
