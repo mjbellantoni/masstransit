@@ -18,16 +18,24 @@ class GameWindow < Chingu::Window
   attr_reader :space
 
   def initialize
-    super(1280, 800, true)
+    super(1280, 800)
     self.caption = "Mass Transit -- Subway Fun!"
+    self.input = { [:q, :esc] => :quit }
   end
 
   def setup
-    switch_game_state(TestState)
+    push_game_state(TestState)
+  end
+
+  def quit
+    pop_game_state
+    $window.close
+    # exit
   end
 
 end
 
+$logger = Logger.new('logfile.log')
 
 window = GameWindow.new
 window.show

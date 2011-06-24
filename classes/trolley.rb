@@ -22,7 +22,8 @@ class Trolley < Chingu::BasicGameObject
   end
 
   def locate_at(track, x, y)
-    # puts "I'm at (#{x}, #{y})"
+    # $logger.debug("(#{x}, #{y}) #{track.dump}")
+    # puts "(#{x}, #{y}) #{track.dump}"
     @track, @x, @y = track, x, y
   end
 

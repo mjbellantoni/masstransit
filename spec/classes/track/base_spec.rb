@@ -15,11 +15,11 @@ describe Track, "when created" do
   end
 
   it "has an unconnected A terminal" do
-    @track.t_a.should_not be_extended
+    @track.t_a.should_not be_linked
   end
 
   it "has an unconnected B terminal" do
-    @track.t_b.should_not be_extended
+    @track.t_b.should_not be_linked
   end
 
 end

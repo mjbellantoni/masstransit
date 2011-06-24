@@ -1,5 +1,6 @@
 require "chingu"
 require "observer"
+require_relative "../classes/terminal"
 
 
 class OffTheRailsException < RuntimeError
@@ -10,37 +11,42 @@ end
 class Track  < Chingu::BasicGameObject
 
   # Handles the connections between Tracks.
-  class Terminal
+  class TrackTerminal < Terminal
 
     include Observable
 
-    attr_accessor :x, :y, :track
+    attr_accessor :x, :y
 
-    def initialize(track, x, y, direction)
-      super
-      @track = track
+    def initialize(track, x, y, orientation)
+      super(track, orientation)
       @x, @y = x, y
-      @direction = direction
-      @link = nil
+    end
+
+    def track
+      @trunk
     end
 
     # Place a trolley onto the system.
     def carry(trolley)
-      @track.carry(trolley, @direction)
+      track.carry(trolley, @orientation)
       notify(:enter, trolley)
-      trolley.locate_at(@track, @x, @y)
+      trolley.locate_at(track, @x, @y)
     end
 
     # Pick up the trolley from another track.
     def pickup(trolley, duty_cycle = 1.0)
-      @track.carry(trolley, @direction)
+      track.carry(trolley, @orientation)
       notify(:enter, trolley)
-      @track.update
+      trolley.locate_at(track, @x, @y)
+      track.update(duty_cycle)
     end
 
     # Hand off the trolley to another track.
     def handoff(trolley, duty_cycle = 1.0)
-      @track.drop
+     # puts "HANDOFF #{duty_cycle}"
+      # $logger.debug("HANDOFF #{duty_cycle}")
+      # trolley.locate_at(track, @x, @y)
+      track.drop
       notify(:exit, trolley)
       @link.pickup(trolley, duty_cycle)
     end
@@ -52,22 +58,7 @@ class Track  < Chingu::BasicGameObject
       end
     end
 
-    # Link to terminal of another track.
-    def link_to(t)
-      @link = t
-    end
-
-    def extended?
-      not @link.nil?
-    end
-
-    def self.link(t_x, t_y)
-      t_x.link_to(t_y)
-      t_y.link_to(t_x)
-    end
-
     def notify(action, trolley)
-      # puts "Notify #{action}"
       changed
       notify_observers(action, trolley)
     end
@@ -81,11 +72,10 @@ class Track  < Chingu::BasicGameObject
   A_TO_B = 0
   B_TO_A = 1
 
-  # def initialize(a_x, a_y, b_x, b_y)
   def initialize(options)
     super(options)
-    @terminal_a = Terminal.new(self, options[:a_x], options[:a_y], A_TO_B)
-    @terminal_b = Terminal.new(self, options[:b_x], options[:b_y], B_TO_A)
+    @terminal_a = TrackTerminal.new(self, options[:a_x], options[:a_y], A_TO_B)
+    @terminal_b = TrackTerminal.new(self, options[:b_x], options[:b_y], B_TO_A)
     @trolley = nil
     @trolley_direction = nil
   end
@@ -123,20 +113,22 @@ class Track  < Chingu::BasicGameObject
   private :moving_b_to_a?
 
   # TODO Assumes the trolley is stopped or moving forward.
-  def update
+  def update(duty_cycle = 1.0)
+    # puts "UPDATE #{duty_cycle}"
     unless trolley.nil?
       x0, y0, x1, y1, t0, t1 = orient_direction
 
       theta = Math.atan2(y1 - y0, x1 - x0)
-      vx = trolley.v * Math.cos(theta)
-      vy = trolley.v * Math.sin(theta)
+      vx = trolley.v * duty_cycle * Math.cos(theta)
+      vy = trolley.v * duty_cycle * Math.sin(theta)
 
       d = Gosu::distance(trolley.x, trolley.y, x1, y1)
-      unless d < trolley.v
+      # $logger.debug("#{d}, #{trolley.v}, #{Math.hypot(vx, vy)}")
+      unless d < trolley.v * duty_cycle
         trolley.locate_at(self, trolley.x + vx, trolley.y + vy)
       else
-        if t1.extended?
-          t1.handoff(@trolley, d / trolley.v)
+        if t1.linked?
+          t1.handoff(trolley, 1.0 - (d / trolley.v))
         else
           raise OffTheRailsException, "The trolley ran off the end of the track!"
         end
@@ -146,6 +138,7 @@ class Track  < Chingu::BasicGameObject
 
   # The trolley is heading from (x0, y0) to (x1, y1)
   def orient_direction
+    # TODO Use instance variables directly.
     case
     when moving_a_to_b?
       [t_a.x, t_a.y, t_b.x, t_b.y, t_a, t_b]
@@ -154,6 +147,11 @@ class Track  < Chingu::BasicGameObject
     else
       raise RuntimeError, "Unable to orient direction."
     end
+  end
+
+  def dump
+    x0, y0, x1, y1, t0, t1 = orient_direction
+    "(#{x0}, #{y0}) -> (#{x1}, #{y1})"
   end
 
   def draw
